@@ -37,8 +37,9 @@ RSpec.describe "CustomersControllers", type: :request do
   end
   describe "get edit_customer_path" do
     it "renders the :edit template" do
-      get "/customers/edit"
-      expect(response.status).to eq(302)
+      customer = FactoryBot.create(:customer)
+      get "/customers/#{customer.id}/edit"
+      expect(response.status).to eq(200)
     end
   end
   describe "post customers_path with valid data" do
@@ -62,30 +63,27 @@ RSpec.describe "CustomersControllers", type: :request do
   describe "put customer_path with valid data" do
     it "updates an entry and redirects to the show path for the customer" do
       customer = FactoryBot.create(:customer)
-      expect { put "/customers/#{customer.id}", params: {customer: customer.attributes}
-      }.to_not change(Customer, :count)
-      expect(response.status).to eq(302)
+      put "/customers/#{customer.id}", params: {customer: {first_name: "Jack"}}
+      customer.reload
+      expect(customer.first_name).to eq("Jack")
+      expect(response).to redirect_to("/customers/#{customer.id}")
     end
   end
   describe "put customer_path with invalid data" do
     it "does not update the customer record or redirect" do
       customer = FactoryBot.create(:customer)
-      customer.email = "2adfa.com"
-      p customer
-      expect { put "/customers/#{customer.id}", params: {customer: customer.attributes}
-      }.to_not change(Customer, :count)
-      expect(response.status).to eq(200)
+      put "/customers/#{customer.id}", params: {customer: {email: "2adfa.com"}}
+      customer.reload
+      expect(customer.email).not_to eq("2adfa.com")
+      expect(response).to render_template(:edit)
     end
   end
   describe "delete a customer record" do
     it "deletes a customer record" do
       customer = FactoryBot.create(:customer)
-      p customer
-      expect { delete "/customers/#{customer.id}", params: {customer: customer.attributes}
+      expect { delete "/customers/#{customer.id}"
       }.to change(Customer, :count)
-      expect(response.status).to eq(302)
+      expect(response).to redirect_to(customers_path)
     end
   end
 end
-
-

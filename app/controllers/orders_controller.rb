@@ -17,15 +17,13 @@ class OrdersController < ApplicationController
     end
 
     def create
-        @customer_options = Customer.all.map{ |u| [ u.first_name ] }
-        p @customer_options
         @order = Order.new(order_params)
         if @order.save
           flash.notice = "The order record was created successfully."
           redirect_to @order
-          else
-            flash.now.alert = @order.errors.full_messages.to_sentence
-            render :new
+        else
+          flash.now.alert = @order.errors.full_messages.to_sentence
+          render :edit
         end
     end
 

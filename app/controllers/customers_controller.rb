@@ -7,7 +7,6 @@ rescue_from ActiveRecord::RecordNotFound, with: :catch_not_found
   # GET /customers.json
   def index
     @customers = Customer.all
-    p @customers.orders
   end
 
   # GET /customers/1
